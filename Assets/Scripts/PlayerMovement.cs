@@ -5,60 +5,55 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Rigidbody2D rb;
-    public Transform groundCheck;
-    public LayerMask groundLayer;
-    public float baseSpeed;
-    public float dashSpeed;
-    
-    private float speed;
-    private float horizontal;
-    private float jumpingPower = 16f;
+    public Vector2 RawMovementInput { get; private set; }
 
-    private void Start()
-    {
-        speed = baseSpeed;
-    }
+    public int NormInputX { get; private set; }
+    public int NormInputY { get; private set; }
 
-    // Update is called once per frame
-    void Update()
+    public bool JumpInput { get; private set; }
+
+    [SerializeField]
+    private float inputHoldTime = 0.2f;
+
+    private float jumpInputStartTime;
+
+    private void Update()
     {
-        rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+        CheckJumpInputHoldTime();
     }
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if(context.performed && IsGrounded())
+        if (context.started)
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
-        }
-        else if (context.canceled && rb.velocity.y > 0f)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+            JumpInput = true;
+            jumpInputStartTime = Time.time;
         }
     }
 
-    private bool IsGrounded()
+    public void UseJumpInput()
     {
-        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+        JumpInput = false;
+    }
+
+    private void CheckJumpInputHoldTime()
+    {
+        if(Time.time >= jumpInputStartTime + inputHoldTime)
+        {
+            JumpInput = false;
+        }
     }
 
     public void Move(InputAction.CallbackContext context)
     {
-        horizontal = context.ReadValue<Vector2>().x;
+        RawMovementInput = context.ReadValue<Vector2>();
+
+        NormInputX = (int)(RawMovementInput * Vector2.right).normalized.x;
+        NormInputY = (int)(RawMovementInput * Vector2.up).normalized.y;
     }
 
     public void Dash(InputAction.CallbackContext context)
     {
-        if (context.performed)
-        {
-            speed = dashSpeed;
-        }
-        else if (context.canceled)
-        {
-            speed = baseSpeed;
-        }
-    }
 
+    }
 }
