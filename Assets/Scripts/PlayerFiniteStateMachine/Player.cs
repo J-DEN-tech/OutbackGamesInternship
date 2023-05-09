@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     public PlayerJumpState JumpState { get; private set; }
     public PlayerInAirState InAirState { get; private set; }
     public PlayerLandState LandState { get; private set; }
+    public PlayerDashState DashState { get; private set; }
 
     [SerializeField]
     private PlayerData playerData;
@@ -23,6 +24,8 @@ public class Player : MonoBehaviour
     public PlayerMovement Movement { get; private set; }
 
     public Rigidbody2D RB { get; private set; }
+
+    public Transform DashDirectionIndicator { get; private set; }
     #endregion
 
     #region Check Transforms
@@ -48,6 +51,7 @@ public class Player : MonoBehaviour
         JumpState = new PlayerJumpState(this, StateMachine, playerData, "inAir");
         InAirState = new PlayerInAirState(this, StateMachine, playerData, "inAir");
         LandState = new PlayerLandState(this, StateMachine, playerData, "land");
+        DashState = new PlayerDashState(this, StateMachine, playerData, "inAir");
     }
 
     private void Start()
@@ -55,6 +59,7 @@ public class Player : MonoBehaviour
         Anim = GetComponent<Animator>();
         Movement = GetComponent<PlayerMovement>();
         RB = GetComponent<Rigidbody2D>();
+        DashDirectionIndicator = transform.Find("DashDirectionIndicator");
 
         FacingDirection = 1;
 
@@ -84,6 +89,13 @@ public class Player : MonoBehaviour
     public void SetVelocityY(float velocity)
     {
         workspace.Set(CurrentVelocity.x, velocity);
+        RB.velocity = workspace;
+        CurrentVelocity = workspace;
+    }
+
+    public void SetVelocity(float velocity, Vector2 direction)
+    {
+        workspace = direction * velocity;
         RB.velocity = workspace;
         CurrentVelocity = workspace;
     }

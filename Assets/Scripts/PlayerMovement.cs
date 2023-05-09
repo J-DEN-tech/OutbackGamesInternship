@@ -5,21 +5,37 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private PlayerInput playerInput;
+    private Camera cam;
+
     public Vector2 RawMovementInput { get; private set; }
+    public Vector2 RawDashDirectionInput { get; private set; }
+    public Vector2Int DashDirectionInput { get; private set; }
 
     public int NormInputX { get; private set; }
     public int NormInputY { get; private set; }
 
     public bool JumpInput { get; private set; }
+    public bool JumpInputStop { get; private set; }
+    public bool DashInput { get; private set; }
+    public bool DashInputStop { get; private set; }
 
     [SerializeField]
     private float inputHoldTime = 0.2f;
 
     private float jumpInputStartTime;
+    private float dashInputStartTime;
+
+    private void Start()
+    {
+        playerInput = GetComponent<PlayerInput>();
+        cam = Camera.main;
+    }
 
     private void Update()
     {
         CheckJumpInputHoldTime();
+        CheckDashInputHoldTime();
     }
 
     public void Jump(InputAction.CallbackContext context)
@@ -27,7 +43,13 @@ public class PlayerMovement : MonoBehaviour
         if (context.started)
         {
             JumpInput = true;
+            JumpInputStop = false;
             jumpInputStartTime = Time.time;
+        }
+
+        if (context.canceled)
+        {
+            JumpInputStop = true;
         }
     }
 
@@ -54,6 +76,40 @@ public class PlayerMovement : MonoBehaviour
 
     public void Dash(InputAction.CallbackContext context)
     {
+        if (context.started)
+        {
+            DashInput = true;
+            DashInputStop = false;
+            dashInputStartTime = Time.time;
+        }
+        else if (context.canceled)
+        {
+            DashInputStop = true;
+        }
+    }
 
+    public void UseDashInput()
+    {
+        DashInput = false;
+    }
+
+    private void CheckDashInputHoldTime()
+    {
+        if(Time.time >= dashInputStartTime + inputHoldTime)
+        {
+            DashInput = false;
+        }
+    }
+
+    public void DashDirection(InputAction.CallbackContext context)
+    {
+        RawDashDirectionInput = context.ReadValue<Vector2>();
+
+        if(playerInput.currentControlScheme == "KeyboardMouse")
+        {
+            RawDashDirectionInput = cam.ScreenToWorldPoint((Vector3)RawDashDirectionInput) - transform.position;
+        }
+
+        DashDirectionInput = Vector2Int.RoundToInt(RawDashDirectionInput.normalized);
     }
 }

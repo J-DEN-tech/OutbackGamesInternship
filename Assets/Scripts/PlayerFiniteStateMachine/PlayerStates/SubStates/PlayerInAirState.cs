@@ -7,7 +7,10 @@ public class PlayerInAirState : PlayerState
     private bool isGrounded;
     private int xInput;
     private bool jumpInput;
+    private bool jumpInputStop;
     private bool coyoteTime;
+    private bool isJumping;
+    private bool dashInput;
 
     public PlayerInAirState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
@@ -34,16 +37,26 @@ public class PlayerInAirState : PlayerState
     {
         base.LogicUpdate();
 
+        CheckCoyoteTime();
+
         xInput = player.Movement.NormInputX;
         jumpInput = player.Movement.JumpInput;
+        jumpInputStop = player.Movement.JumpInputStop;
+        dashInput = player.Movement.DashInput;
 
-        if(isGrounded && player.CurrentVelocity.y < 0.01f)
+        CheckJumpMultiplier();
+
+        if (isGrounded && player.CurrentVelocity.y < 0.01f)
         {
             stateMachine.ChangeState(player.LandState);
         }
         else if(jumpInput && player.JumpState.CanJump())
         {
             stateMachine.ChangeState(player.JumpState);
+        }
+        else if(dashInput && player.DashState.CheckIfCanDash())
+        {
+            stateMachine.ChangeState(player.DashState);
         }
         else
         {
@@ -55,6 +68,22 @@ public class PlayerInAirState : PlayerState
         }
     }
 
+    private void CheckJumpMultiplier()
+    {
+        if (isJumping)
+        {
+            if (jumpInputStop)
+            {
+                player.SetVelocityY(player.CurrentVelocity.y * playerData.variableJumpHeightMultiplier);
+                isJumping = false;
+            }
+            else if (player.CurrentVelocity.y <= 0f)
+            {
+                isJumping = false;
+            }
+        }
+    }
+
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
@@ -62,9 +91,20 @@ public class PlayerInAirState : PlayerState
 
     private void CheckCoyoteTime()
     {
-        if(coyoteTime = true && Time.time > startTime + )
+        if(coyoteTime = true && Time.time > startTime + playerData.coyoteTime)
         {
-
+            coyoteTime = false;
+            player.JumpState.DecreaseAmountOfJumpsLeft();
         }
+    }
+
+    public void StartCoyoteTime()
+    {
+        coyoteTime = true;
+    }
+    
+    public void SetIsJumping()
+    {
+        isJumping = true;
     }
 }
