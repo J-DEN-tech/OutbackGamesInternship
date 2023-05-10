@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class PlayerJumpState : PlayerAbilityState
@@ -14,8 +15,8 @@ public class PlayerJumpState : PlayerAbilityState
     public override void Enter()
     {
         base.Enter();
-
-        player.SetVelocityY(playerData.jumpVelocity);
+        player.InputHandler.UseJumpInput();
+        core.Movement.SetVelocityY(playerData.jumpVelocity);
         isAbilityDone = true;
         amountOfJumpsLeft--;
         player.InAirState.SetIsJumping();
@@ -23,7 +24,7 @@ public class PlayerJumpState : PlayerAbilityState
 
     public bool CanJump()
     {
-        if(amountOfJumpsLeft > 0)
+        if (amountOfJumpsLeft > 0)
         {
             return true;
         }
@@ -33,13 +34,7 @@ public class PlayerJumpState : PlayerAbilityState
         }
     }
 
-    public void ResetAmountOfJumpsLeft()
-    {
-        amountOfJumpsLeft = playerData.amountOfJumps;
-    }
+    public void ResetAmountOfJumpsLeft() => amountOfJumpsLeft = playerData.amountOfJumps;
 
-    public void DecreaseAmountOfJumpsLeft()
-    {
-        amountOfJumpsLeft--;
-    }
+    public void DecreaseAmountOfJumpsLeft() => amountOfJumpsLeft--;
 }

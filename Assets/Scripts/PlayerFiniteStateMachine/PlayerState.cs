@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerState
 {
+    protected Core core;
+
     protected Player player;
     protected PlayerStateMachine stateMachine;
     protected PlayerData playerData;
@@ -21,6 +24,7 @@ public class PlayerState
         this.stateMachine = stateMachine;
         this.playerData = playerData;
         this.animBoolName = animBoolName;
+        core = player.Core;
     }
 
     public virtual void Enter()
@@ -28,7 +32,7 @@ public class PlayerState
         DoChecks();
         player.Anim.SetBool(animBoolName, true);
         startTime = Time.time;
-        Debug.Log(animBoolName);
+        //Debug.Log(animBoolName);
         isAnimationFinished = false;
         isExitingState = false;
     }
@@ -49,18 +53,11 @@ public class PlayerState
         DoChecks();
     }
 
-    public virtual void DoChecks()
-    {
+    public virtual void DoChecks() { }
 
-    }
+    public virtual void AnimationTrigger() { }
 
-    public virtual void AnimationTrigger()
-    {
+    public virtual void AnimationFinishTrigger() => isAnimationFinished = true;
 
-    }
 
-    public virtual void AnimationFinishTrigger()
-    {
-        isAnimationFinished = true;
-    }
 }
