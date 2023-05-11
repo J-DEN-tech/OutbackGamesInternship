@@ -204,9 +204,9 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.41666666
-    functionName: AnimationFinishTrigger
+    functionName: AnimtionFinishTrigger
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: b8993ebff76fa244aab0ba670e1717b7, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
