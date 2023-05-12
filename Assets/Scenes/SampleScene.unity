@@ -424,7 +424,6 @@ GameObject:
   - component: {fileID: 737803307}
   - component: {fileID: 737803308}
   - component: {fileID: 737803309}
-  - component: {fileID: 737803310}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -735,20 +734,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d92e4608ae66dcb4b90406169c66ba21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnMove:
+    m_PersistentCalls:
+      m_Calls: []
+  OnJump:
+    m_PersistentCalls:
+      m_Calls: []
+  OnJumpStop:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDash:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDashStop:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDashDirection:
+    m_PersistentCalls:
+      m_Calls: []
+  moveBufferTime: 0
+  jumpBufferTime: 0
+  dashBufferTime: 0
+  dashDirectionBufferTime: 0
   inputHoldTime: 0.2
---- !u!114 &737803310
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 737803298}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62cf65686cdb0f54baadaaf1daf826b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rigidBody: {fileID: 0}
 --- !u!1 &878782276
 GameObject:
   m_ObjectHideFlags: 0

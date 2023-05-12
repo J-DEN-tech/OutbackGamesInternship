@@ -2,12 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : MonoBehaviour
 {
     private PlayerInput playerInput;
     private Camera cam;
+    private InputActionAsset input;
+    private InputAction action;
 
     public Vector2 RawMovementInput { get; private set; }
     public Vector2 RawDashDirectionInput { get; private set; }
@@ -20,8 +23,30 @@ public class PlayerInputHandler : MonoBehaviour
     public bool DashInput { get; private set; }
     public bool DashInputStop { get; private set; }
 
-    //public bool[] AttackInputs { get; private set; }
+    [Header("Input Feedback Events")]
+    [SerializeField] private UnityEvent OnMove = new UnityEvent();
+    [SerializeField] private UnityEvent OnJump = new UnityEvent();
+    [SerializeField] private UnityEvent OnJumpStop = new UnityEvent();
+    [SerializeField] private UnityEvent OnDash = new UnityEvent();
+    [SerializeField] private UnityEvent OnDashStop = new UnityEvent();
+    [SerializeField] private UnityEvent OnDashDirection = new UnityEvent();
 
+    [Header("Input Buffering Times")]
+    public float moveBufferTime;
+    public float jumpBufferTime;
+    public float dashBufferTime;
+    public float dashDirectionBufferTime;
+    private float currentMoveTime;
+    private float currentJumpTime;
+    private float currentDashTime;
+    private float currentDashDirectionTime;
+    private bool canPerformMove;
+    private bool canPerformJump;
+    private bool canPerformDash;
+    private bool canPerformDashDirection;
+
+    //public bool[] AttackInputs { get; private set; }
+    [Space]
     [SerializeField]
     private float inputHoldTime = 0.2f;
 
@@ -36,12 +61,29 @@ public class PlayerInputHandler : MonoBehaviour
         //AttackInputs = new bool[count];
 
         cam = Camera.main;
+
+        currentMoveTime = moveBufferTime;
+        currentJumpTime = jumpBufferTime;
+        currentDashTime = dashBufferTime;
+        currentDashDirectionTime = dashDirectionBufferTime;
+
+        
     }
 
     private void Update()
     {
+        currentMoveTime -= Time.time;
+        currentJumpTime -= Time.time;
+        currentDashTime -= Time.time;
+        currentDashDirectionTime -= Time.time;
+
         CheckJumpInputHoldTime();
         CheckDashInputHoldTime();
+
+        /*if (input.FindAction()
+        {
+
+        }*/
     }
 
     /*public void OnPrimaryAttackInput(InputAction.CallbackContext context)
@@ -74,6 +116,8 @@ public class PlayerInputHandler : MonoBehaviour
     {
         RawMovementInput = context.ReadValue<Vector2>();
 
+        OnMove.Invoke();
+
         NormInputX = Mathf.RoundToInt(RawMovementInput.x);
         NormInputY = Mathf.RoundToInt(RawMovementInput.y);
 
@@ -83,6 +127,8 @@ public class PlayerInputHandler : MonoBehaviour
     {
         if (context.started)
         {
+            OnJump.Invoke();
+
             JumpInput = true;
             JumpInputStop = false;
             jumpInputStartTime = Time.time;
@@ -90,6 +136,8 @@ public class PlayerInputHandler : MonoBehaviour
 
         if (context.canceled)
         {
+            OnJumpStop.Invoke();
+
             JumpInputStop = true;
         }
     }
@@ -111,12 +159,16 @@ public class PlayerInputHandler : MonoBehaviour
     {
         if (context.started)
         {
+            OnDash.Invoke();
+
             DashInput = true;
             DashInputStop = false;
             dashInputStartTime = Time.time;
         }
         else if (context.canceled)
         {
+            OnDashStop.Invoke();
+
             DashInputStop = true;
         }
     }
@@ -125,7 +177,9 @@ public class PlayerInputHandler : MonoBehaviour
     {
         RawDashDirectionInput = context.ReadValue<Vector2>();
 
-        if (playerInput.currentControlScheme == "Keyboard")
+        OnDashDirection.Invoke();
+
+        if (playerInput.currentControlScheme == "KeyboardMouse")
         {
             RawDashDirectionInput = cam.ScreenToWorldPoint((Vector3)RawDashDirectionInput) - transform.position;
         }
@@ -152,6 +206,7 @@ public class PlayerInputHandler : MonoBehaviour
             DashInput = false;
         }
     }
+
 }
 
 /*public enum CombatInputs
