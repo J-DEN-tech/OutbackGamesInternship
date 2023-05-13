@@ -9,8 +9,6 @@ public class PlayerInputHandler : MonoBehaviour
 {
     private PlayerInput playerInput;
     private Camera cam;
-    private InputActionAsset input;
-    private InputAction action;
 
     public Vector2 RawMovementInput { get; private set; }
     public Vector2 RawDashDirectionInput { get; private set; }
@@ -31,19 +29,8 @@ public class PlayerInputHandler : MonoBehaviour
     [SerializeField] private UnityEvent OnDashStop = new UnityEvent();
     [SerializeField] private UnityEvent OnDashDirection = new UnityEvent();
 
-    [Header("Input Buffering Times")]
-    public float moveBufferTime;
-    public float jumpBufferTime;
-    public float dashBufferTime;
-    public float dashDirectionBufferTime;
-    private float currentMoveTime;
-    private float currentJumpTime;
-    private float currentDashTime;
-    private float currentDashDirectionTime;
-    private bool canPerformMove;
-    private bool canPerformJump;
-    private bool canPerformDash;
-    private bool canPerformDashDirection;
+    private List<PlayerActionItem> inputBuffer = new List<PlayerActionItem>();
+    private bool isActionAllowed;
 
     //public bool[] AttackInputs { get; private set; }
     [Space]
@@ -61,29 +48,32 @@ public class PlayerInputHandler : MonoBehaviour
         //AttackInputs = new bool[count];
 
         cam = Camera.main;
-
-        currentMoveTime = moveBufferTime;
-        currentJumpTime = jumpBufferTime;
-        currentDashTime = dashBufferTime;
-        currentDashDirectionTime = dashDirectionBufferTime;
-
-        
     }
 
     private void Update()
     {
-        currentMoveTime -= Time.time;
-        currentJumpTime -= Time.time;
-        currentDashTime -= Time.time;
-        currentDashDirectionTime -= Time.time;
-
         CheckJumpInputHoldTime();
         CheckDashInputHoldTime();
+    }
 
-        /*if (input.FindAction()
+    private void CheckInput()
+    {
+        if (playerInput.actions["Move"].WasPerformedThisFrame())
         {
-
-        }*/
+            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.Move, Time.time));
+        }
+        else if (playerInput.actions["Jump"].WasPerformedThisFrame())
+        {
+            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.Jump, Time.time));
+        }
+        else if (playerInput.actions["Dash"].WasPerformedThisFrame())
+        {
+            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.Dash, Time.time));
+        }
+        else if (playerInput.actions["DashDirection"].WasPerformedThisFrame())
+        {
+            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.DashDirection, Time.time));
+        }
     }
 
     /*public void OnPrimaryAttackInput(InputAction.CallbackContext context)
