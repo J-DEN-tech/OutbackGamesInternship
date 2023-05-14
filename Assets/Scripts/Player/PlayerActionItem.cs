@@ -11,9 +11,9 @@ public class PlayerActionItem
     public static float TimeBeforeActionsExpire = 2f;
 
     //Constructor
-    public PlayerActionItem(InputAction ia, float stamp)
+    public PlayerActionItem(InputAction playerAction, float stamp)
     {
-        Action = ia;
+        Action = playerAction;
         Timestamp = stamp;
     }
 

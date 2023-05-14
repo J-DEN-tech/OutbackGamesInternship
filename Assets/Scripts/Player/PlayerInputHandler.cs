@@ -31,6 +31,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     private List<PlayerActionItem> inputBuffer = new List<PlayerActionItem>();
     private bool isActionAllowed;
+    private bool doMove;
 
     //public bool[] AttackInputs { get; private set; }
     [Space]
@@ -54,6 +55,12 @@ public class PlayerInputHandler : MonoBehaviour
     {
         CheckJumpInputHoldTime();
         CheckDashInputHoldTime();
+
+        CheckInput();
+        if (isActionAllowed)
+        {
+            TryBufferedAction();
+        }
     }
 
     private void CheckInput()
@@ -73,6 +80,25 @@ public class PlayerInputHandler : MonoBehaviour
         else if (playerInput.actions["DashDirection"].WasPerformedThisFrame())
         {
             inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.DashDirection, Time.time));
+        }
+    }
+
+    private void TryBufferedAction()
+    {
+        if(inputBuffer.Count > 0)
+        {
+            foreach(PlayerActionItem playerAction in inputBuffer.ToArray())
+            {
+                inputBuffer.Remove(playerAction);
+                if (playerAction.CheckIfValid())
+                {
+                    if(playerAction.InputAction == PlayerActionItem.InputAction.Move)
+                    {
+                        doMove = true;
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -104,13 +130,15 @@ public class PlayerInputHandler : MonoBehaviour
 
     public void OnMoveInput(InputAction.CallbackContext context)
     {
-        RawMovementInput = context.ReadValue<Vector2>();
+        if (doMove)
+        {
+            RawMovementInput = context.ReadValue<Vector2>();
 
-        OnMove.Invoke();
+            OnMove.Invoke();
 
-        NormInputX = Mathf.RoundToInt(RawMovementInput.x);
-        NormInputY = Mathf.RoundToInt(RawMovementInput.y);
-
+            NormInputX = Mathf.RoundToInt(RawMovementInput.x);
+            NormInputY = Mathf.RoundToInt(RawMovementInput.y);
+        }
     }
 
     public void OnJumpInput(InputAction.CallbackContext context)
