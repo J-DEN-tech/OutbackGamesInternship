@@ -30,8 +30,11 @@ public class PlayerInputHandler : MonoBehaviour
     [SerializeField] private UnityEvent OnDashDirection = new UnityEvent();
 
     private List<PlayerActionItem> inputBuffer = new List<PlayerActionItem>();
-    private bool isActionAllowed;
+    [HideInInspector] public bool isActionAllowed;
     private bool doMove;
+    private bool doJump;
+    private bool doDash;
+    private bool doDashDirection;
 
     //public bool[] AttackInputs { get; private set; }
     [Space]
@@ -92,11 +95,23 @@ public class PlayerInputHandler : MonoBehaviour
                 inputBuffer.Remove(playerAction);
                 if (playerAction.CheckIfValid())
                 {
-                    if(playerAction.InputAction == PlayerActionItem.InputAction.Move)
+                    if(playerAction.action == PlayerActionItem.InputAction.Move)
                     {
                         doMove = true;
-                        break;
                     }
+                    else if (playerAction.action == PlayerActionItem.InputAction.Jump)
+                    {
+                        doJump = true;
+                    }
+                    else if(playerAction.action == PlayerActionItem.InputAction.Dash)
+                    {
+                        doDash = true;
+                    }
+                    else if(playerAction.action == PlayerActionItem.InputAction.DashDirection)
+                    {
+                        doDashDirection = true;
+                    }
+                    break;
                 }
             }
         }
@@ -139,25 +154,30 @@ public class PlayerInputHandler : MonoBehaviour
             NormInputX = Mathf.RoundToInt(RawMovementInput.x);
             NormInputY = Mathf.RoundToInt(RawMovementInput.y);
         }
+        doMove = false;
     }
 
     public void OnJumpInput(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (doJump)
         {
-            OnJump.Invoke();
+            if (context.started)
+            {
+                OnJump.Invoke();
 
-            JumpInput = true;
-            JumpInputStop = false;
-            jumpInputStartTime = Time.time;
+                JumpInput = true;
+                JumpInputStop = false;
+                jumpInputStartTime = Time.time;
+            }
+
+            if (context.canceled)
+            {
+                OnJumpStop.Invoke();
+
+                JumpInputStop = true;
+            }
         }
-
-        if (context.canceled)
-        {
-            OnJumpStop.Invoke();
-
-            JumpInputStop = true;
-        }
+        doJump = false;
     }
 
     /*public void OnGrabInput(InputAction.CallbackContext context)
@@ -175,34 +195,42 @@ public class PlayerInputHandler : MonoBehaviour
 
     public void OnDashInput(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (doDash)
         {
-            OnDash.Invoke();
+            if (context.started)
+            {
+                OnDash.Invoke();
 
-            DashInput = true;
-            DashInputStop = false;
-            dashInputStartTime = Time.time;
-        }
-        else if (context.canceled)
-        {
-            OnDashStop.Invoke();
+                DashInput = true;
+                DashInputStop = false;
+                dashInputStartTime = Time.time;
+            }
+            else if (context.canceled)
+            {
+                OnDashStop.Invoke();
 
-            DashInputStop = true;
+                DashInputStop = true;
+            }
         }
+        doDash = false;
     }
 
     public void OnDashDirectionInput(InputAction.CallbackContext context)
     {
-        RawDashDirectionInput = context.ReadValue<Vector2>();
-
-        OnDashDirection.Invoke();
-
-        if (playerInput.currentControlScheme == "KeyboardMouse")
+        if (doDashDirection)
         {
-            RawDashDirectionInput = cam.ScreenToWorldPoint((Vector3)RawDashDirectionInput) - transform.position;
-        }
+            RawDashDirectionInput = context.ReadValue<Vector2>();
 
-        DashDirectionInput = Vector2Int.RoundToInt(RawDashDirectionInput.normalized);
+            OnDashDirection.Invoke();
+
+            if (playerInput.currentControlScheme == "KeyboardMouse")
+            {
+                RawDashDirectionInput = cam.ScreenToWorldPoint((Vector3)RawDashDirectionInput) - transform.position;
+            }
+
+            DashDirectionInput = Vector2Int.RoundToInt(RawDashDirectionInput.normalized);
+        }
+        doDashDirection = false;
     }
 
     public void UseJumpInput() => JumpInput = false;
