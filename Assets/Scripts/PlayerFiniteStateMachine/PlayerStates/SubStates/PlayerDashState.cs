@@ -21,6 +21,8 @@ public class PlayerDashState : PlayerAbilityState
     {
         base.Enter();
 
+        player.InputHandler.isActionAllowed = true;
+
         CanDash = false;
         player.InputHandler.UseDashInput();
 
@@ -37,6 +39,8 @@ public class PlayerDashState : PlayerAbilityState
     public override void Exit()
     {
         base.Exit();
+
+        player.InputHandler.isActionAllowed = false;
 
         if (core.Movement.CurrentVelocity.y > 0)
         {
