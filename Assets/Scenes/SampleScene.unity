@@ -685,7 +685,7 @@ MonoBehaviour:
     m_ActionId: de5ef8eb-1d30-4ab3-bf7f-9d830397f6ef
     m_ActionName: Player/DashDirection[/Mouse/position]
   m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
+  m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
@@ -752,10 +752,7 @@ MonoBehaviour:
   OnDashDirection:
     m_PersistentCalls:
       m_Calls: []
-  moveBufferTime: 0
-  jumpBufferTime: 0
-  dashBufferTime: 0
-  dashDirectionBufferTime: 0
+  isActionAllowed: 0
   inputHoldTime: 0.2
 --- !u!1 &878782276
 GameObject:

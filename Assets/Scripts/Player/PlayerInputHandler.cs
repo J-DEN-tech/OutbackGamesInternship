@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -31,10 +32,11 @@ public class PlayerInputHandler : MonoBehaviour
 
     private List<PlayerActionItem> inputBuffer = new List<PlayerActionItem>();
     [HideInInspector] public bool isActionAllowed;
-    private bool doMove;
-    private bool doJump;
-    private bool doDash;
-    private bool doDashDirection;
+    private InputAction.CallbackContext moveContext;
+    private InputAction.CallbackContext jumpContext;
+    private InputAction.CallbackContext dashContext;
+    private InputAction.CallbackContext dashDirectionContext;
+    private InputAction.CallbackContext nullContext;
 
     //public bool[] AttackInputs { get; private set; }
     [Space]
@@ -59,30 +61,9 @@ public class PlayerInputHandler : MonoBehaviour
         CheckJumpInputHoldTime();
         CheckDashInputHoldTime();
 
-        CheckInput();
         if (isActionAllowed)
         {
             TryBufferedAction();
-        }
-    }
-
-    private void CheckInput()
-    {
-        if (playerInput.actions["Move"].WasPerformedThisFrame())
-        {
-            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.Move, Time.time));
-        }
-        else if (playerInput.actions["Jump"].WasPerformedThisFrame())
-        {
-            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.Jump, Time.time));
-        }
-        else if (playerInput.actions["Dash"].WasPerformedThisFrame())
-        {
-            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.Dash, Time.time));
-        }
-        else if (playerInput.actions["DashDirection"].WasPerformedThisFrame())
-        {
-            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.DashDirection, Time.time));
         }
     }
 
@@ -97,19 +78,19 @@ public class PlayerInputHandler : MonoBehaviour
                 {
                     if(playerAction.action == PlayerActionItem.InputAction.Move)
                     {
-                        doMove = true;
+                        DoMove(moveContext);
                     }
                     else if (playerAction.action == PlayerActionItem.InputAction.Jump)
                     {
-                        doJump = true;
+                        DoJump(jumpContext);
                     }
                     else if(playerAction.action == PlayerActionItem.InputAction.Dash)
                     {
-                        doDash = true;
+                        DoDash(dashContext);
                     }
                     else if(playerAction.action == PlayerActionItem.InputAction.DashDirection)
                     {
-                        doDashDirection = true;
+                        DoDashDirection(dashDirectionContext);
                     }
                     break;
                 }
@@ -143,43 +124,72 @@ public class PlayerInputHandler : MonoBehaviour
         }
     }*/
 
+    #region Move Functions
+
     public void OnMoveInput(InputAction.CallbackContext context)
     {
-        if (doMove)
+        if (context.performed)
         {
-            RawMovementInput = context.ReadValue<Vector2>();
+            moveContext = context;
+            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.Move, Time.time));
+        }
 
-            OnMove.Invoke();
-
-            NormInputX = Mathf.RoundToInt(RawMovementInput.x);
-            NormInputY = Mathf.RoundToInt(RawMovementInput.y);
-
-            doMove = false;
+        if (context.canceled)
+        {
+            DoMove(nullContext);
         }
     }
+
+    public void DoMove(InputAction.CallbackContext context)
+    {
+        RawMovementInput = context.ReadValue<Vector2>();
+
+        OnMove.Invoke();
+
+        NormInputX = Mathf.RoundToInt(RawMovementInput.x);
+        NormInputY = Mathf.RoundToInt(RawMovementInput.y);
+
+        isActionAllowed = false;
+    }
+
+    #endregion
+
+    #region Jump Functions
 
     public void OnJumpInput(InputAction.CallbackContext context)
     {
-        if (doJump)
+        if (context.started)
         {
-            if (context.started)
-            {
-                OnJump.Invoke();
-
-                JumpInput = true;
-                JumpInputStop = false;
-                jumpInputStartTime = Time.time;
-            }
-
-            if (context.canceled)
-            {
-                OnJumpStop.Invoke();
-
-                JumpInputStop = true;
-            }
+            jumpContext = context;
+            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.Jump, Time.time));
         }
-        doJump = false;
+
+        if (context.canceled)
+        {
+            DoJump(nullContext);
+        }
     }
+
+    public void DoJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            OnJump.Invoke();
+
+            JumpInput = true;
+            JumpInputStop = false;
+            jumpInputStartTime = Time.time;
+        }
+
+        if (context.canceled)
+        {
+            OnJumpStop.Invoke();
+
+            JumpInputStop = true;
+        }
+    }
+
+    #endregion
 
     /*public void OnGrabInput(InputAction.CallbackContext context)
     {
@@ -194,45 +204,73 @@ public class PlayerInputHandler : MonoBehaviour
         }
     }*/
 
+    #region Dash FunctionsS
+
     public void OnDashInput(InputAction.CallbackContext context)
     {
-        if (doDash)
+        if (context.started)
         {
-            if (context.started)
-            {
-                OnDash.Invoke();
-
-                DashInput = true;
-                DashInputStop = false;
-                dashInputStartTime = Time.time;
-            }
-            else if (context.canceled)
-            {
-                OnDashStop.Invoke();
-
-                DashInputStop = true;
-            }
+            dashContext = context;
+            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.Dash, Time.time));
         }
-        doDash = false;
+
+        if (context.canceled)
+        {
+            DoDash(nullContext);
+        }
     }
+
+    public void DoDash(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            OnDash.Invoke();
+
+            DashInput = true;
+            DashInputStop = false;
+            dashInputStartTime = Time.time;
+        }
+        else if (context.canceled)
+        {
+            OnDashStop.Invoke();
+
+            DashInputStop = true;
+        }
+    }
+
+    #endregion
+
+    #region Dash Direction Functions
 
     public void OnDashDirectionInput(InputAction.CallbackContext context)
     {
-        if (doDashDirection)
+        if (context.performed)
         {
-            RawDashDirectionInput = context.ReadValue<Vector2>();
-
-            OnDashDirection.Invoke();
-
-            if (playerInput.currentControlScheme == "KeyboardMouse")
-            {
-                RawDashDirectionInput = cam.ScreenToWorldPoint((Vector3)RawDashDirectionInput) - transform.position;
-            }
-
-            DashDirectionInput = Vector2Int.RoundToInt(RawDashDirectionInput.normalized);
+            dashDirectionContext = context;
+            inputBuffer.Add(new PlayerActionItem(PlayerActionItem.InputAction.DashDirection, Time.time));
         }
-        doDashDirection = false;
+
+        if (context.canceled)
+        {
+            DoDashDirection(nullContext);
+        }
     }
+
+    public void DoDashDirection(InputAction.CallbackContext context)
+    {
+        RawDashDirectionInput = context.ReadValue<Vector2>();
+
+        OnDashDirection.Invoke();
+
+        if (playerInput.currentControlScheme == "KeyboardMouse")
+        {
+            RawDashDirectionInput = cam.ScreenToWorldPoint((Vector3)RawDashDirectionInput) - transform.position;
+        }
+
+        DashDirectionInput = Vector2Int.RoundToInt(RawDashDirectionInput.normalized);
+    }
+
+    #endregion
 
     public void UseJumpInput() => JumpInput = false;
 
