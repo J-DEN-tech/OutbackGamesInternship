@@ -30,7 +30,6 @@ public class Movement : CoreComponent
     }
 
     #region Set Functions
-
     public void SetVelocityZero()
     {
         workspace = Vector2.zero;
@@ -84,6 +83,5 @@ public class Movement : CoreComponent
         FacingDirection *= -1;
         RB.transform.Rotate(0.0f, 180.0f, 0.0f);
     }
-
     #endregion
 }

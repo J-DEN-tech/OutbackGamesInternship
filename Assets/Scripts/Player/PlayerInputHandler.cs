@@ -18,7 +18,6 @@ public class PlayerInputHandler : MonoBehaviour
     public int NormInputY { get; private set; }
     public bool JumpInput { get; private set; }
     public bool JumpInputStop { get; private set; }
-    //public bool GrabInput { get; private set; }
     public bool DashInput { get; private set; }
     public bool DashInputStop { get; private set; }
 
@@ -38,7 +37,6 @@ public class PlayerInputHandler : MonoBehaviour
     private InputAction.CallbackContext dashDirectionContext;
     private InputAction.CallbackContext nullContext;
 
-    //public bool[] AttackInputs { get; private set; }
     [Space]
     [SerializeField]
     private float inputHoldTime = 0.2f;
@@ -49,9 +47,6 @@ public class PlayerInputHandler : MonoBehaviour
     private void Start()
     {
         playerInput = GetComponent<PlayerInput>();
-
-        //int count = Enum.GetValues(typeof(CombatInputs)).Length;
-        //AttackInputs = new bool[count];
 
         cam = Camera.main;
     }
@@ -98,34 +93,7 @@ public class PlayerInputHandler : MonoBehaviour
         }
     }
 
-    /*public void OnPrimaryAttackInput(InputAction.CallbackContext context)
-    {
-        if (context.started)
-        {
-            AttackInputs[(int)CombatInputs.primary] = true;
-        }
-
-        if (context.canceled)
-        {
-            AttackInputs[(int)CombatInputs.primary] = false;
-        }
-    }
-
-    public void OnSecondaryAttackInput(InputAction.CallbackContext context)
-    {
-        if (context.started)
-        {
-            AttackInputs[(int)CombatInputs.secondary] = true;
-        }
-
-        if (context.canceled)
-        {
-            AttackInputs[(int)CombatInputs.secondary] = false;
-        }
-    }*/
-
     #region Move Functions
-
     public void OnMoveInput(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -151,11 +119,9 @@ public class PlayerInputHandler : MonoBehaviour
 
         isActionAllowed = false;
     }
-
     #endregion
 
     #region Jump Functions
-
     public void OnJumpInput(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -188,24 +154,9 @@ public class PlayerInputHandler : MonoBehaviour
             JumpInputStop = true;
         }
     }
-
     #endregion
 
-    /*public void OnGrabInput(InputAction.CallbackContext context)
-    {
-        if (context.started)
-        {
-            GrabInput = true;
-        }
-
-        if (context.canceled)
-        {
-            GrabInput = false;
-        }
-    }*/
-
     #region Dash FunctionsS
-
     public void OnDashInput(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -237,11 +188,9 @@ public class PlayerInputHandler : MonoBehaviour
             DashInputStop = true;
         }
     }
-
     #endregion
 
     #region Dash Direction Functions
-
     public void OnDashDirectionInput(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -269,7 +218,6 @@ public class PlayerInputHandler : MonoBehaviour
 
         DashDirectionInput = Vector2Int.RoundToInt(RawDashDirectionInput.normalized);
     }
-
     #endregion
 
     public void UseJumpInput() => JumpInput = false;
@@ -291,11 +239,4 @@ public class PlayerInputHandler : MonoBehaviour
             DashInput = false;
         }
     }
-
 }
-
-/*public enum CombatInputs
-{
-    primary,
-    secondary
-}*/
