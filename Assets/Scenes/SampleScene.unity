@@ -403,7 +403,7 @@ MonoBehaviour:
   ledgeCheckHorizontal: {fileID: 1472900409}
   ledgeCheckVertical: {fileID: 1472900409}
   ceilingCheck: {fileID: 461825986}
-  groundCheckRadius: 0.3
+  groundCheckRadius: 0.5
   wallCheckDistance: 0
   whatIsGround:
     serializedVersion: 2
