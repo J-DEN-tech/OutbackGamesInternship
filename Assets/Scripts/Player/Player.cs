@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
     private Vector2 workspace;
 
     [Header("Debug Variables")]
-    public string currentStateName;
+    public string state;
     public float rigidbodyXVelocity;
     public float rigidbodyYVelocity;
     public float playerGravity;
@@ -68,7 +68,6 @@ public class Player : MonoBehaviour
     {
         Core.LogicUpdate();
         StateMachine.CurrentState.LogicUpdate();
-        currentStateName = StateMachine.CurrentState.ToString();
         rigidbodyXVelocity = RB.velocity.x;
         rigidbodyYVelocity = RB.velocity.y;
 

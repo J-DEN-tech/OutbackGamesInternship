@@ -6,22 +6,24 @@ public class Core : MonoBehaviour
 {
     public Movement Movement
     {
-        get => GenericNotImplementedError<Movement>.TryGet(movement, transform.parent.name);
+        get => GenericNotImplementedError<Movement>.TryGet(movement, parentName);
         private set => movement = value;
     }
     public CollisionSenses CollisionSenses
     {
-        get => GenericNotImplementedError<CollisionSenses>.TryGet(collisionSenses, transform.parent.name);
+        get => GenericNotImplementedError<CollisionSenses>.TryGet(collisionSenses, parentName);
         private set => collisionSenses = value;
     }
 
     private Movement movement;
     private CollisionSenses collisionSenses;
+    private string parentName;
 
     private void Awake()
     {
         Movement = GetComponentInChildren<Movement>();
         CollisionSenses = GetComponentInChildren<CollisionSenses>();
+        parentName = transform.parent.name;
     }
 
     public void LogicUpdate()

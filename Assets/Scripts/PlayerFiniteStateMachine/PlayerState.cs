@@ -30,9 +30,10 @@ public class PlayerState
     public virtual void Enter()
     {
         DoChecks();
+        player.state = stateMachine.CurrentState.ToString();
         player.Anim.SetBool(animBoolName, true);
         startTime = Time.time;
-        Debug.Log(animBoolName);
+        //Debug.Log(animBoolName);
         player.InputHandler.isActionAllowed = true;
         isAnimationFinished = false;
         isExitingState = false;
