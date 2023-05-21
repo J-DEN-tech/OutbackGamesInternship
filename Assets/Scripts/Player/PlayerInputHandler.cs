@@ -108,7 +108,7 @@ public class PlayerInputHandler : MonoBehaviour
         }
     }
 
-    public void DoMove(InputAction.CallbackContext context)
+    private void DoMove(InputAction.CallbackContext context)
     {
         RawMovementInput = context.ReadValue<Vector2>();
 
@@ -136,7 +136,7 @@ public class PlayerInputHandler : MonoBehaviour
         }
     }
 
-    public void DoJump(InputAction.CallbackContext context)
+    private void DoJump(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
@@ -171,7 +171,7 @@ public class PlayerInputHandler : MonoBehaviour
         }
     }
 
-    public void DoDash(InputAction.CallbackContext context)
+    private void DoDash(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
@@ -205,7 +205,7 @@ public class PlayerInputHandler : MonoBehaviour
         }
     }
 
-    public void DoDashDirection(InputAction.CallbackContext context)
+    private void DoDashDirection(InputAction.CallbackContext context)
     {
         RawDashDirectionInput = context.ReadValue<Vector2>();
 

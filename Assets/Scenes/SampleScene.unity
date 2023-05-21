@@ -722,7 +722,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerData: {fileID: 11400000, guid: 577f60dda53000e4980aa446a3dd0c3d, type: 2}
-  currentStateName: 
+  state: 
   rigidbodyXVelocity: 0
   rigidbodyYVelocity: 0
   playerGravity: 0
